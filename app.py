@@ -51,15 +51,25 @@ feature_descriptions = {
 user_inputs = {}
 for feature, info in resources['feature_ranges'].items():
     description = feature_descriptions.get(feature, feature)
-    user_inputs[feature] = st.sidebar.slider(
-        description,
-        min_value=info['min'],
-        max_value=info['max'],
-        value=info['mean'],
-        step=(info['max'] - info['min']) / 100,
-        format="%.3f" if feature == 'remallused_theta_a' else None
-    )
-
+    if feature == 'remallused_theta_a':
+        # 小数型slider
+        user_inputs[feature] = st.sidebar.slider(
+            description,
+            min_value=float(info['min']),
+            max_value=float(info['max']),
+            value=float(info['mean']),
+            step=0.01,      # 你可以改成你想要的小数步长
+            format="%.3f"
+        )
+    else:
+        # 整数型slider
+        user_inputs[feature] = st.sidebar.slider(
+            description,
+            min_value=int(info['min']),
+            max_value=int(info['max']),
+            value=int(round(info['mean'])),
+            step=1           # 你可以改成你想要的整数步长
+        )
 # 创建预测按钮
 predict_button = st.sidebar.button("预测抑郁风险", type="primary")
 
@@ -183,7 +193,6 @@ if not predict_button:
     - 算法: 随机森林
     - 特征数: 3
     - 验证AUC: 0.86
-    - 开发团队: 心理健康研究组
     """)
 
 # 添加页脚
